@@ -15,7 +15,6 @@
     "github": "https://github.com/shiki-01"
   },
   "license": "MIT",
-  "private": true,
   "keywords": [
     "logging",
     "status",
