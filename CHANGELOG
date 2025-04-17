@@ -1,0 +1,21 @@
+# CHANGELOG
+
+すべての重要な変更はこのファイルに記録されます。
+
+フォーマットは [Keep a Changelog](https://keepachangelog.com/) に基づいており、このプロジェクトは [Semantic Versioning](https://semver.org/lang/ja/) を採用しています。
+
+## [0.0.1] - 2025-04-17
+### 追加
+- `logStatus` 関数を実装。ステータスコードに基づいてログを出力し、API レスポンス形式のオブジェクトを生成。
+- `StatusSchemaManager` クラスを実装。ステータススキーマの取得、更新、削除が可能。
+- 初期のステータススキーマを定義（`SUCCESS`, `WARN`, `ERROR`）。
+- TypeScript 型定義を追加（`Status`, `APISchema`, `StatusSchema`）。
+- 単体テストを追加（`logStatus` 関数と `StatusSchemaManager` クラスのテストを含む）。
+- `README.md` を作成し、基本的な使用例と API ドキュメントを記載。
+- `LICENSE` ファイルを追加（MIT ライセンス）。
+- `package.json` を設定し、プロジェクトのメタデータを記載。
+
+### 修正
+- 初期リリースのため、修正点はありません。
+
+---

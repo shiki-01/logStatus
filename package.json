@@ -1,0 +1,40 @@
+{
+  "name": "@shiki-01/logstatus",
+  "version": "0.0.1",
+  "description": "A Bun package for logging status messages.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "bun run build",
+    "test": "bun test"
+  },
+  "author": {
+    "name": "shiki-01",
+    "email": "contact@shiki-01.com",
+    "github": "https://github.com/shiki-01"
+  },
+  "license": "MIT",
+  "private": true,
+  "keywords": [
+    "logging",
+    "status",
+    "typescript",
+    "bun"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiki-01/logStatus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shiki-01/logStatus/issues"
+  },
+  "homepage": "https://github.com/shiki-01/logStatus#readme",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/jest": "^29.5.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
