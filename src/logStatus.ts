@@ -127,10 +127,8 @@ const logStatus = <T extends object | unknown>(
     );
 
     let logMessage = status.message;
-    console.log(JSON.stringify(message, null, 2));
 
     if (logMessage === undefined || logMessage === null) {
-        console.warn(`No message provided for status code: ${status.code}`);
         if (statusType && statusSchema[statusType as keyof StatusSchema]?.[status.code]) {
             logMessage = statusSchema[statusType as keyof StatusSchema][status.code]?.message;
         } else {
