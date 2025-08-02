@@ -127,8 +127,10 @@ const logStatus = <T extends object | unknown>(
     );
 
     let logMessage = status.message;
+    console.log(JSON.stringify(message, null, 2));
 
-    if (!logMessage) {
+    if (logMessage === undefined || logMessage === null) {
+        console.warn(`No message provided for status code: ${status.code}`);
         if (statusType && statusSchema[statusType as keyof StatusSchema]?.[status.code]) {
             logMessage = statusSchema[statusType as keyof StatusSchema][status.code]?.message;
         } else {
@@ -156,17 +158,21 @@ const logStatus = <T extends object | unknown>(
 
     if (statusType === 'SUCCESS') {
         console.log(`[SUCCESS] ${logMessage}`);
+        console.log(`  └─`, message);
         return { status, data: message };
     } else if (statusType === 'ERROR') {
         console.error(`[ERROR] ${logMessage}`);
         if (error) {
             const errorMessage = error instanceof Error ? error.message : error;
+            console.error(`  │─`, message);
             console.error(`  └─ ${errorMessage}`);
             return { status, error: errorMessage };
         }
+        console.error(`  └─`, message);
         return { status, error: logMessage };
     } else if (statusType === 'WARN') {
         console.warn(`[WARN] ${logMessage}`);
+        console.warn(`  └─`, message);
         return { status, data: message };
     } else {
         console.error(`[ERROR] Invalid status code: ${status.code}`);
