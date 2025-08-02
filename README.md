@@ -7,6 +7,7 @@
 - ステータスコードに基づいたメッセージの自動生成
 - カスタムステータスの追加・更新・削除が可能
 - 成功、警告、エラーのログ出力をサポート
+- サイレントモード機能（グローバル設定と個別設定が可能）
 - TypeScript による型安全な設計
 
 ## インストール
@@ -55,6 +56,40 @@ console.log(result);
 // 出力: { status: { code: 201, message: 'Created' } }
 ```
 
+### サイレントモード
+
+コンソール出力を制御できます。グローバル設定と個別設定の両方をサポートしています。
+
+#### グローバルサイレントモード
+
+```typescript
+import { statusSchemaManager, logStatus } from '@shiki-01/logstatus';
+
+// サイレントモードを有効にする
+statusSchemaManager.setSilentMode(true);
+
+// コンソール出力なし、戻り値のみ
+const result = logStatus({ code: 404 }, { message: 'カードが見つかりませんでした' });
+
+// サイレントモードを無効にする
+statusSchemaManager.setSilentMode(false);
+```
+
+#### 個別サイレントモード
+
+```typescript
+import { logStatus } from '@shiki-01/logstatus';
+
+// この呼び出しのみサイレント（コンソール出力なし）
+const result1 = logStatus({ code: 404 }, { message: 'エラー' }, undefined, true);
+
+// この呼び出しは通常通りコンソール出力
+const result2 = logStatus({ code: 200 }, { data: 'success' }, undefined, false);
+
+// グローバル設定を使用
+const result3 = logStatus({ code: 200 }, { data: 'success' });
+```
+
 ## API ドキュメント
 
 ### `logStatus`
@@ -66,6 +101,7 @@ console.log(result);
 - `status` (`Status`): ステータスオブジェクト。`code` はステータスコード、`message` はオプションのカスタムメッセージ。
 - `message` (`T`): ステータスに関連付けられたデータ。デフォルトは空オブジェクト。
 - `error` (`unknown`): エラーオブジェクトまたはエラーメッセージ（オプション）。
+- `silent` (`boolean`): この呼び出しでのサイレントモード設定。`true` でコンソール出力を無効化、`false` で有効化、`undefined` でグローバル設定を使用（オプション）。
 
 #### 戻り値
 
@@ -90,6 +126,23 @@ console.log(result);
 - `getStatusMessage(type, code)`: 指定されたステータスタイプとコードに対応するメッセージを取得します。
 - `updateStatus(type, code, message)`: 新しいステータスを追加または更新します。
 - `removeStatus(type, code)`: 指定されたステータスを削除します。
+- `setSilentMode(silent)`: グローバルサイレントモードを設定します。
+- `getSilentMode()`: サイレントモードの状態を取得します。
+
+#### サイレントモード使用例
+
+```typescript
+import { statusSchemaManager } from '@shiki-01/logstatus';
+
+// サイレントモードの状態を確認
+console.log(statusSchemaManager.getSilentMode()); // false
+
+// サイレントモードを有効にする
+statusSchemaManager.setSilentMode(true);
+
+// 状態を再確認
+console.log(statusSchemaManager.getSilentMode()); // true
+```
 
 ## 開発者向け情報
 
