@@ -40,6 +40,8 @@ class StatusSchemaManager {
         }
     };
 
+    private silentMode: boolean = false;
+
     /**
      * ステータススキーマ全体を取得します。
      *
@@ -47,6 +49,24 @@ class StatusSchemaManager {
      */
     getSchema() {
         return this.schema;
+    }
+
+    /**
+     * サイレントモードを設定します。
+     *
+     * @param {boolean} silent - サイレントモードを有効にする場合は `true`、無効にする場合は `false`。
+     */
+    setSilentMode(silent: boolean): void {
+        this.silentMode = silent;
+    }
+
+    /**
+     * サイレントモードの状態を取得します。
+     *
+     * @returns {boolean} サイレントモードが有効な場合は `true`、無効な場合は `false`。
+     */
+    getSilentMode(): boolean {
+        return this.silentMode;
     }
 
     /**
@@ -99,6 +119,7 @@ const statusSchemaManager = new StatusSchemaManager();
  * @param {Status} status - ログに出力するステータスオブジェクト。`code` はステータスコード、`message` はオプションのカスタムメッセージ。
  * @param {T} [message={}] - ステータスに関連付けられたデータ。オブジェクトまたは任意の値を指定可能。
  * @param {unknown} [error] - エラーが発生した場合のエラーオブジェクトまたはエラーメッセージ（オプション）。
+ * @param {boolean} [silent] - この呼び出しでのサイレントモード設定。`true` でコンソール出力を無効化、`false` で有効化、`undefined` でグローバル設定を使用。
  * @returns {APISchema<T>} APIレスポンス形式のオブジェクト。`status` フィールドにステータス情報を含み、`data` または `error` フィールドを持つ。
  *
  * @example
@@ -114,11 +135,19 @@ const statusSchemaManager = new StatusSchemaManager();
  * const result = logStatus(status, {}, 'Not Found');
  * console.log(result);
  * // 出力: { status: { code: 404, message: 'Not Found' }, error: 'Not Found' }
+ *
+ * @example
+ * // サイレントモードでログを出力（コンソール出力なし）
+ * const status = { code: 404 };
+ * const result = logStatus(status, { message: 'カードが見つかりませんでした' }, undefined, true);
+ * console.log(result);
+ * // コンソール出力なし、戻り値のみ
  */
 const logStatus = <T extends object | unknown>(
     status: Status,
     message: T = {} as T,
-    error?: unknown
+    error?: unknown,
+    silent?: boolean
 ): APISchema<T> => {
     const statusSchema = statusSchemaManager.getSchema();
 
@@ -154,26 +183,42 @@ const logStatus = <T extends object | unknown>(
         message: logMessage
     }
 
+    // サイレントモードの判定: 引数で指定された場合は優先、未指定の場合はグローバル設定を使用
+    const isSilent = silent !== undefined ? silent : statusSchemaManager.getSilentMode();
+
     if (statusType === 'SUCCESS') {
-        console.log(`[SUCCESS] ${logMessage}`);
-        console.log(`  └─`, message);
+        if (!isSilent) {
+            console.log(`[SUCCESS] ${logMessage}`);
+            console.log(`  └─`, message);
+        }
         return { status, data: message };
     } else if (statusType === 'ERROR') {
-        console.error(`[ERROR] ${logMessage}`);
-        if (error) {
-            const errorMessage = error instanceof Error ? error.message : error;
-            console.error(`  │─`, message);
-            console.error(`  └─ ${errorMessage}`);
-            return { status, error: errorMessage };
+        if (!isSilent) {
+            console.error(`[ERROR] ${logMessage}`);
+            if (error) {
+                const errorMessage = error instanceof Error ? error.message : error;
+                console.error(`  │─`, message);
+                console.error(`  └─ ${errorMessage}`);
+                return { status, error: errorMessage };
+            }
+            console.error(`  └─`, message);
+        } else {
+            if (error) {
+                const errorMessage = error instanceof Error ? error.message : error;
+                return { status, error: errorMessage };
+            }
         }
-        console.error(`  └─`, message);
         return { status, error: logMessage };
     } else if (statusType === 'WARN') {
-        console.warn(`[WARN] ${logMessage}`);
-        console.warn(`  └─`, message);
+        if (!isSilent) {
+            console.warn(`[WARN] ${logMessage}`);
+            console.warn(`  └─`, message);
+        }
         return { status, data: message };
     } else {
-        console.error(`[ERROR] Invalid status code: ${status.code}`);
+        if (!isSilent) {
+            console.error(`[ERROR] Invalid status code: ${status.code}`);
+        }
         return { status, error: 'Internal Server Error' };
     }
 }
